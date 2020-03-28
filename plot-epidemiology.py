@@ -33,9 +33,9 @@ for country in countries:
 				j += 1
 		
 		plt.plot(x, y, label=country)
-		#print(country)
-		#print(x)
-		#print(y)
 
+plt.title('Confirmed case progression per day after 100')
 plt.legend(loc=2)
+plt.ylim(top=4000)
+plt.xlim(right=20)
 plt.show()
