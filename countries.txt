@@ -1,2 +1,3 @@
 Argentina,Spain,United Kingdom
-Sweden,Italy,Chile
+Canada,Italy,Brazil
+US,Sweden

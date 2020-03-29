@@ -22,7 +22,7 @@ for country in countries:
 		x = matplotlib.dates.date2num([datetime.datetime.strptime(s, '%m/%d/%y') for s in headers[4:]])
 		y = [int(s) for s in values[4:]]
 		plt.plot_date(x, y, label=country)
-
+	
 plt.legend(loc=2)
 plt.show()
 

@@ -14,11 +14,12 @@ for country in countries:
 	with open('time_series_covid19_confirmed_global.csv') as csvfile:
 		reader = csv.reader(csvfile)
 		headers = next(reader)[4:]
-		values = []
+		values = [0 for i in range(len(headers))]
 		for row in reader:
-			if country == row[1] and row[0] == '':
-				values = [int(s) for s in row[4:]]
-				break
+			if country == row[1]:
+				row = row[4:]
+				for i in range(len(row)):
+					values[i] += int(row[i])
 		
 		x = []
 		y = []
