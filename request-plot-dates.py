@@ -91,8 +91,7 @@ for name in countries_filter:
 
 plt.title('Confirmed daily cases')
 ax1.legend(loc=2)
-plt.show()
-plt.close(fig1)
+#plt.show()
 
 linestyles = ['-','--','-.',':']
 fig2 = plt.figure(dpi=100) #figsize=(16,8),dpi=200
@@ -106,10 +105,13 @@ for name in countries_filter:
 
 plt.title('Confirmed case progression per day after 100 cases')
 ax2.legend(loc=2)
-ax2.set_ylim(top=4000)
+ax2.set_ylim(top=4000,bottom=0)
 ax2.set_xlim(right=20)
+
 plt.show()
+
 plt.close(fig2)
+plt.close(fig1)
 
 #linestyles = ['-','--','-.',':']
 #fig3 = plt.figure(dpi=100) #figsize=(16,8),dpi=200
