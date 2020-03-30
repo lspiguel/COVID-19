@@ -21,9 +21,11 @@ class Date_Series():
 		self.confirmed = seriesData
 		self.ProcessConfirmedDelta()
 	def ProcessConfirmedDelta(self):
-		self.confirmed_delta = [0]
+		deltas = []
+		deltas.append(0)
 		for i in range(1, len(self.confirmed)):
-			self.confirmed_delta.append(self.confirmed[i] - self.confirmed[i - 1])
+			deltas.append(self.confirmed[i] - self.confirmed[i - 1])
+		self.confirmed_delta = np.array(deltas)
 
 class Over_Threshold_Series():
 	def __init__(self):
@@ -47,9 +49,11 @@ class Over_Threshold_Series():
 		self.confirmed = np.array(y)
 		self.ProcessConfirmedDelta()
 	def ProcessConfirmedDelta(self):
-		deltas = [0]
-		for i in range(1, len(self.confirmed)):
-			deltas.append(self.confirmed[i] - self.confirmed[i - 1])
+		deltas = []
+		if len(self.confirmed) > 0:
+			deltas.append(0)
+			for i in range(1, len(self.confirmed)):
+				deltas.append(self.confirmed[i] - self.confirmed[i - 1])
 		self.confirmed_delta = np.array(deltas)
 			
 class Country_Data():
@@ -91,7 +95,7 @@ for name in countries_filter:
 
 plt.title('Confirmed daily cases')
 ax1.legend(loc=2)
-#plt.show()
+plt.show()
 
 linestyles = ['-','--','-.',':']
 fig2 = plt.figure(dpi=100) #figsize=(16,8),dpi=200
@@ -106,26 +110,26 @@ for name in countries_filter:
 plt.title('Confirmed case progression per day after 100 cases')
 ax2.legend(loc=2)
 ax2.set_ylim(top=4000,bottom=0)
-ax2.set_xlim(right=20)
+ax2.set_xlim(right=20,left=0)
 
 plt.show()
 
-plt.close(fig2)
-plt.close(fig1)
-
 #linestyles = ['-','--','-.',':']
-#fig3 = plt.figure(dpi=100) #figsize=(16,8),dpi=200
-#ax3 = plt.axes([0.1, 0.1, 0.8, 0.8])
-#i = 0
-#for name in countries_filter:
-#	country_data = data[name]
-#	if len(country_data.over_threshold_series.confirmed_delta) > 0:
-#		ax3.plot(country_data.over_threshold_series.x, country_data.over_threshold_series.confirmed_delta, label=country_data.name,ls=linestyles[(i//6)%4])
-#		i += 1
+fig3 = plt.figure(dpi=100) #figsize=(16,8),dpi=200
+ax3 = plt.axes([0.1, 0.1, 0.8, 0.8])
+i = 0
+for name in countries_filter:
+	country_data = data[name]
+	if len(country_data.over_threshold_series.confirmed_delta) > 0:
+		ax3.plot(country_data.over_threshold_series.x, country_data.over_threshold_series.confirmed_delta, label=country_data.name,ls=linestyles[(i//6)%4])
+		i += 1
 
-#plt.title('Confirmed case difference per day after 100 cases')
-#ax3.legend(loc=2)
-#ax3.set_ylim(top=4000)
-#ax3.set_xlim(right=20)
-#plt.show()
-#plt.close(fig3)
+plt.title('Confirmed case difference per day after 100 cases')
+ax3.legend(loc=2)
+ax3.set_ylim(top=2000,bottom=0)
+ax3.set_xlim(right=20,left=0)
+plt.show()
+
+plt.close(fig1)
+plt.close(fig2)
+plt.close(fig3)
