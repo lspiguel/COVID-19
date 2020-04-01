@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from contextlib import closing
 
 confirmed_url = 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv'
-countries_filter = ['Argentina','Spain','United Kingdom','Italy','US','Sweden','Brazil','Canada','China','Germany']
+countries_filter = ['Argentina','Spain','United Kingdom','Italy','US','Sweden','Brazil','Canada','China','Germany','Chile','India']
 #countries_filter = ['Argentina']
 threshold = 100
 data = {}
@@ -86,15 +86,19 @@ with closing(requests.get(confirmed_url)) as r:
 			else:
 				data[name].AddConfirmed(row[4:])
 
+linestyles = ['-','--','-.',':']
 fig1 = plt.figure(dpi=100)
 ax1 = plt.axes([0.1, 0.1, 0.8, 0.8]) #xticks=[], yticks=[]
+i = 0
 for name in countries_filter:
 	country_data = data[name]
 	if len(country_data.date_series.confirmed) > 0:
-		ax1.plot_date(country_data.date_series.x, country_data.date_series.confirmed, label=country_data.name,ls='-')
-
+		ax1.plot_date(country_data.date_series.x, country_data.date_series.confirmed,linestyles[(i//6)%4], label=country_data.name)
+		i += 1
+		
 plt.title('Confirmed daily cases')
 ax1.legend(loc=2)
+#ax1.set_xlim(left=matplotlib.dates.date2num(datetime.date.today()))
 plt.show()
 
 linestyles = ['-','--','-.',':']
@@ -104,7 +108,7 @@ i = 0
 for name in countries_filter:
 	country_data = data[name]
 	if len(country_data.over_threshold_series.confirmed) > 0:
-		ax2.plot(country_data.over_threshold_series.x, country_data.over_threshold_series.confirmed, label=country_data.name,ls=linestyles[(i//6)%4])
+		ax2.plot(country_data.over_threshold_series.x, country_data.over_threshold_series.confirmed, label=country_data.name,ls=linestyles[(i//6)%4],marker='')
 		i += 1
 
 plt.title('Confirmed case progression per day after 100 cases')
