@@ -11,6 +11,8 @@ class Date_Series():
 		self.x = x
 		self.confirmed = []
 		self.confirmed_delta = []
+		# self.recovered = []
+		# self.deaths = []
 	def SetConfirmed(self, seriesData):
 		self.confirmed = seriesData
 		self.ProcessConfirmedDelta()
@@ -58,19 +60,40 @@ class Country_Data():
 		self.date_series = Date_Series(matplotlib.dates.date2num(self.dates))
 		self.over_threshold_series = Over_Threshold_Series()
 		self.confirmed = []
-	def SetConfirmed(self, seriesData):
-		self.confirmed = [int(v) for v in seriesData]
+		self.recovered = []
+		self.deaths = []
+	def SetConfirmed(self, confirmed):
+		self.confirmed = [int(v) for v in confirmed]
 		self.date_series.SetConfirmed(self.confirmed)
 		self.over_threshold_series.SetConfirmed(self.confirmed)
+	def SetRecovered(self, recovered):
+		self.recovered = [int(v) for v in recovered]
+		# self.date_series.SetRecovered(self.recovered)
+		# self.over_threshold_series.SetRecovered(self.recovered)
+	def SetDeaths(self, deaths):
+		self.deaths = [int(v) for v in deaths]
+		# self.date_series.SetDeaths(self.deaths)
+		# self.over_threshold_series.SetDeaths(self.deaths)
 	def AddConfirmed(self, seriesData):
 		for i in range(len(self.confirmed)):
 			self.confirmed[i] += int(seriesData[i])
 		self.date_series.SetConfirmed(self.confirmed)
 		self.over_threshold_series.SetConfirmed(self.confirmed)
+	def AddRecovered(self, recovered):
+		for i in range(len(self.recovered)):
+			self.recovered[i] += int(recovered[i])
+		# self.date_series.SetRecovered(self.recovered)
+		# self.over_threshold_series.SetRecovered(self.recovered)
+	def AddDeaths(self, deaths):
+		for i in range(len(self.deaths)):
+			self.deaths[i] += int(deaths[i])
+		# self.date_series.SetDeaths(self.deaths)
+		# self.over_threshold_series.SetDeaths(self.deaths)
 
-def Load(url, filter):
-	with closing(requests.get(url)) as r:
-		return_data = {}
+def Load(url_confirmed, deaths_url, recovered_url, filter):
+	return_data = {}
+	headers = []
+	with closing(requests.get(url_confirmed)) as r:
 		f = (line.decode('utf-8') for line in r.iter_lines())
 		reader = csv.reader(f, delimiter=',', quotechar='"')
 		headers = next(reader)[4:]
@@ -84,7 +107,20 @@ def Load(url, filter):
 					return_data[name].AddConfirmed(row[4:])
 	return return_data
 
-def Graph__Daily_Confirmed(data, filter):
+def Load_Countries_Filter():
+	countries = []
+	try:
+		with open('countries.txt') as csvcountries:
+			reader = csv.reader(csvcountries)
+			for row in reader:
+				for col in row:
+					countries.append(col)
+	except:
+		countries = ['Argentina','Spain','United Kingdom','Italy','US','Sweden','Brazil','Canada','China','Germany','Chile','India']
+		#countries = ['Argentina']
+	return countries
+
+def Graph_Daily_Confirmed_Lineal(data, filter):
 	linestyles = ['-','--','-.',':']
 	fig1 = plt.figure(dpi=100)
 	ax1 = plt.axes([0.1, 0.1, 0.8, 0.8]) #xticks=[], yticks=[]
@@ -101,7 +137,7 @@ def Graph__Daily_Confirmed(data, filter):
 	plt.show()
 	plt.close(fig1)
 
-def Graph_Over_Threshold(data, filter):
+def Graph_Confirmed_Over_Threshold_Lineal(data, filter):
 	linestyles = ['-','--','-.',':']
 	fig2 = plt.figure(dpi=100) #figsize=(16,8),dpi=200
 	ax2 = plt.axes([0.1, 0.1, 0.8, 0.8])
@@ -119,7 +155,7 @@ def Graph_Over_Threshold(data, filter):
 	plt.show()
 	plt.close(fig2)
 
-def Graph_Bar(data, filter):
+def Graph_Confirmed_Deltas_Bar(data, filter):
 	colors = ['b','g','r','c','m','y','k']
 	fig3 = plt.figure(dpi=100) #figsize=(16,8),dpi=200
 	ax3 = plt.axes([0.1, 0.1, 0.8, 0.8])
@@ -141,13 +177,15 @@ def Graph_Bar(data, filter):
 
 def main():
 	confirmed_url = 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv'
-	countries_filter = ['Argentina','Spain','United Kingdom','Italy','US','Sweden','Brazil','Canada','China','Germany','Chile','India']
-	#countries_filter = ['Argentina']
+	deaths_url = 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv'
+	recovered_url = 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_recovered_global.csv'
 
-	countries_data = Load(confirmed_url, countries_filter)
-	Graph__Daily_Confirmed(countries_data, countries_filter)
-	Graph_Over_Threshold(countries_data, countries_filter)
-	Graph_Bar(countries_data, countries_filter)
+	countries_filter = Load_Countries_Filter()
+	countries_data = Load(confirmed_url, deaths_url, recovered_url, countries_filter)
+
+	Graph_Daily_Confirmed_Lineal(countries_data, countries_filter)
+	Graph_Confirmed_Over_Threshold_Lineal(countries_data, countries_filter)
+	Graph_Confirmed_Deltas_Bar(countries_data, countries_filter)
 
 if __name__ == '__main__':
 	main()
