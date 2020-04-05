@@ -11,11 +11,15 @@ class Date_Series():
 		self.x = x
 		self.confirmed = []
 		self.confirmed_delta = []
-		# self.recovered = []
-		# self.deaths = []
+		self.recovered = []
+		self.deaths = []
 	def SetConfirmed(self, seriesData):
 		self.confirmed = seriesData
 		self.ProcessConfirmedDelta()
+	def SetRecovered(self, seriesData):
+		self.recovered = seriesData
+	def SetDeaths(self, seriesData):
+		self.deaths = seriesData
 	def ProcessConfirmedDelta(self):
 		deltas = []
 		deltas.append(0)
@@ -25,9 +29,13 @@ class Date_Series():
 
 class Over_Threshold_Series():
 	def __init__(self):
-		self.x = np.array([])
+		self.confirmed_x = np.array([])
 		self.confirmed = np.array([])
 		self.confirmed_delta = np.array([])
+		self.recovered_x = np.array([])
+		self.recovered = np.array([])
+		self.deaths_x = np.array([])
+		self.deaths = np.array([])
 	def SetConfirmed(self, values):		
 		x = []
 		y = []
@@ -42,9 +50,41 @@ class Over_Threshold_Series():
 					x.append(j)
 					y.append(int(values[i]))
 					j += 1
-		self.x = np.array(x)
+		self.confirmed_x = np.array(x)
 		self.confirmed = np.array(y)
 		self.ProcessConfirmedDelta()
+	def SetRecovered(self, values):		
+		x = []
+		y = []
+		threshold = 100
+		if values[0] < threshold:
+			j = 0
+			overthreshold = False
+			for i in range(len(values)):
+				if int(values[i]) >= threshold or overthreshold == True:
+					overthreshold = True
+				if overthreshold == True:
+					x.append(j)
+					y.append(int(values[i]))
+					j += 1
+		self.recovered_x= np.array(x)
+		self.recovered = np.array(y)
+	def SetDeaths(self, values):		
+		x = []
+		y = []
+		threshold = 100
+		if values[0] < threshold:
+			j = 0
+			overthreshold = False
+			for i in range(len(values)):
+				if int(values[i]) >= threshold or overthreshold == True:
+					overthreshold = True
+				if overthreshold == True:
+					x.append(j)
+					y.append(int(values[i]))
+					j += 1
+		self.deaths_x = np.array(x)
+		self.deaths = np.array(y)
 	def ProcessConfirmedDelta(self):
 		deltas = []
 		if len(self.confirmed) > 0:
@@ -68,12 +108,12 @@ class Country_Data():
 		self.over_threshold_series.SetConfirmed(self.confirmed)
 	def SetRecovered(self, recovered):
 		self.recovered = [int(v) for v in recovered]
-		# self.date_series.SetRecovered(self.recovered)
-		# self.over_threshold_series.SetRecovered(self.recovered)
+		self.date_series.SetRecovered(self.recovered)
+		self.over_threshold_series.SetRecovered(self.recovered)
 	def SetDeaths(self, deaths):
 		self.deaths = [int(v) for v in deaths]
-		# self.date_series.SetDeaths(self.deaths)
-		# self.over_threshold_series.SetDeaths(self.deaths)
+		self.date_series.SetDeaths(self.deaths)
+		self.over_threshold_series.SetDeaths(self.deaths)
 	def AddConfirmed(self, seriesData):
 		for i in range(len(self.confirmed)):
 			self.confirmed[i] += int(seriesData[i])
@@ -82,13 +122,28 @@ class Country_Data():
 	def AddRecovered(self, recovered):
 		for i in range(len(self.recovered)):
 			self.recovered[i] += int(recovered[i])
-		# self.date_series.SetRecovered(self.recovered)
-		# self.over_threshold_series.SetRecovered(self.recovered)
+		self.date_series.SetRecovered(self.recovered)
+		self.over_threshold_series.SetRecovered(self.recovered)
 	def AddDeaths(self, deaths):
 		for i in range(len(self.deaths)):
 			self.deaths[i] += int(deaths[i])
-		# self.date_series.SetDeaths(self.deaths)
-		# self.over_threshold_series.SetDeaths(self.deaths)
+		self.date_series.SetDeaths(self.deaths)
+		self.over_threshold_series.SetDeaths(self.deaths)
+	def HasConfirmedData(self):
+		if len(self.confirmed) > 0:
+			return True
+		else:
+			return False
+	def HasRecoveredData(self):
+		if len(self.recovered) > 0:
+			return True
+		else:
+			return False
+	def HasDeathsData(self):
+		if len(self.deaths) > 0:
+			return True
+		else:
+			return False
 
 def Load(url_confirmed, deaths_url, recovered_url, filter):
 	return_data = {}
@@ -105,6 +160,33 @@ def Load(url_confirmed, deaths_url, recovered_url, filter):
 					return_data[name].SetConfirmed(row[4:])
 				else:
 					return_data[name].AddConfirmed(row[4:])
+					
+	with closing(requests.get(deaths_url)) as r:
+		f = (line.decode('utf-8') for line in r.iter_lines())
+		reader = csv.reader(f, delimiter=',', quotechar='"')
+		next(reader)
+		for row in reader:
+			name = row[1]
+			if name in filter:
+				if name in return_data:
+					if not return_data[name].HasDeathsData():
+						return_data[name].SetDeaths(row[4:])
+					else:
+						return_data[name].AddDeaths(row[4:])
+					
+	with closing(requests.get(recovered_url)) as r:
+		f = (line.decode('utf-8') for line in r.iter_lines())
+		reader = csv.reader(f, delimiter=',', quotechar='"')
+		next(reader)
+		for row in reader:
+			name = row[1]
+			if name in filter:
+				if name in return_data:
+					if not return_data[name].HasRecoveredData():
+						return_data[name].SetRecovered(row[4:])
+					else:
+						return_data[name].AddRecovered(row[4:])
+
 	return return_data
 
 def Load_Countries_Filter():
@@ -137,6 +219,23 @@ def Graph_Daily_Confirmed_Lineal(data, filter):
 	plt.show()
 	plt.close(fig1)
 
+def Graph_Daily_Deaths_Lineal(data, filter):
+	linestyles = ['-','--','-.',':']
+	fig1 = plt.figure(dpi=100)
+	ax1 = plt.axes([0.1, 0.1, 0.8, 0.8]) #xticks=[], yticks=[]
+	i = 0
+	for name in filter:
+		country_data = data[name]
+		if len(country_data.date_series.deaths) > 0:
+			ax1.plot_date(country_data.date_series.x, country_data.date_series.deaths,linestyles[(i//6)%4], label=country_data.name)
+			i += 1
+		
+	plt.title('Daily deaths')
+	ax1.legend(loc=2)
+	#ax1.set_xlim(left=matplotlib.dates.date2num(datetime.date.today()))
+	plt.show()
+	plt.close(fig1)
+	
 def Graph_Confirmed_Over_Threshold_Lineal(data, filter):
 	linestyles = ['-','--','-.',':']
 	fig2 = plt.figure(dpi=100) #figsize=(16,8),dpi=200
@@ -145,12 +244,48 @@ def Graph_Confirmed_Over_Threshold_Lineal(data, filter):
 	for name in filter:
 		country_data = data[name]
 		if len(country_data.over_threshold_series.confirmed) > 0:
-			ax2.plot(country_data.over_threshold_series.x, country_data.over_threshold_series.confirmed, label=country_data.name,ls=linestyles[(i//6)%4],marker='')
+			ax2.plot(country_data.over_threshold_series.confirmed_x, country_data.over_threshold_series.confirmed, label=country_data.name,ls=linestyles[(i//6)%4],marker='')
 			i += 1
 
 	plt.title('Confirmed case progression per day after 100 cases')
 	ax2.legend(loc=2)
 	ax2.set_ylim(top=4000,bottom=0)
+	ax2.set_xlim(right=20,left=0)
+	plt.show()
+	plt.close(fig2)
+
+def Graph_Confirmed_Over_Threshold_Log(data, filter):
+	linestyles = ['-','--','-.',':']
+	fig2 = plt.figure(dpi=100) #figsize=(16,8),dpi=200
+	ax2 = plt.axes([0.1, 0.1, 0.8, 0.8],yscale='log')
+	i = 0
+	for name in filter:
+		country_data = data[name]
+		if len(country_data.over_threshold_series.confirmed) > 0:
+			ax2.plot(country_data.over_threshold_series.confirmed_x, country_data.over_threshold_series.confirmed, label=country_data.name,ls=linestyles[(i//6)%4],marker='')
+			i += 1
+
+	plt.title('Confirmed case progression per day after 100 cases (log scale)')
+	ax2.legend(loc=2)
+	ax2.set_ylim(top=20000,bottom=0)
+	ax2.set_xlim(right=20,left=0)
+	plt.show()
+	plt.close(fig2)
+
+def Graph_Deaths_Over_Threshold_Log(data, filter):
+	linestyles = ['-','--','-.',':']
+	fig2 = plt.figure(dpi=100) #figsize=(16,8),dpi=200
+	ax2 = plt.axes([0.1, 0.1, 0.8, 0.8], yscale='log')
+	i = 0
+	for name in filter:
+		country_data = data[name]
+		if len(country_data.over_threshold_series.deaths) > 0:
+			ax2.plot(country_data.over_threshold_series.deaths_x, country_data.over_threshold_series.deaths, label=country_data.name,ls=linestyles[(i//6)%4],marker='')
+			i += 1
+
+	plt.title('Death toll per day after 100 deaths (log scale)')
+	ax2.legend(loc=2)
+	ax2.set_ylim(bottom=0,top=20000)
 	ax2.set_xlim(right=20,left=0)
 	plt.show()
 	plt.close(fig2)
@@ -163,7 +298,7 @@ def Graph_Confirmed_Deltas_Bar(data, filter):
 	for name in filter:
 		country_data = data[name]
 		if len(country_data.over_threshold_series.confirmed_delta) > 0:
-			x = [x + i / 7 for x in country_data.over_threshold_series.x]
+			x = [x + i / 7 for x in country_data.over_threshold_series.confirmed_x]
 			ax3.bar(x, country_data.over_threshold_series.confirmed_delta, label=country_data.name,align='center',width=.15,color=colors[i%7],edgecolor='w')
 			i += 1
 		if i >= 6:
@@ -184,9 +319,11 @@ def main():
 	countries_data = Load(confirmed_url, deaths_url, recovered_url, countries_filter)
 
 	Graph_Daily_Confirmed_Lineal(countries_data, countries_filter)
+	Graph_Daily_Deaths_Lineal(countries_data, countries_filter)
 	Graph_Confirmed_Over_Threshold_Lineal(countries_data, countries_filter)
-	Graph_Confirmed_Deltas_Bar(countries_data, countries_filter)
+	Graph_Confirmed_Over_Threshold_Log(countries_data, countries_filter)
+	Graph_Deaths_Over_Threshold_Log(countries_data, countries_filter)
+	#Graph_Confirmed_Deltas_Bar(countries_data, countries_filter)
 
 if __name__ == '__main__':
 	main()
-
