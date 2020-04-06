@@ -213,9 +213,9 @@ def Load_Countries_Filter():
 		#countries = ['Argentina']
 	return countries
 
-def Graph_Daily_Confirmed_Lineal(data, filter):
+def Graph_Daily_Confirmed_Lineal(data, filter, timestamp):
 	linestyles = ['-','--','-.',':']
-	fig1 = plt.figure(dpi=100)
+	fig1 = plt.figure(dpi=300)
 	ax1 = plt.axes([0.1, 0.1, 0.8, 0.8]) #xticks=[], yticks=[]
 	i = 0
 	for name in filter:
@@ -224,15 +224,16 @@ def Graph_Daily_Confirmed_Lineal(data, filter):
 			ax1.plot_date(country_data.date_series.x, country_data.date_series.confirmed,linestyles[(i//6)%4], label=country_data.name)
 			i += 1
 		
-	plt.title('Total confirmed cases, by date')
-	ax1.legend(loc=2)
+	fig1.suptitle('Total confirmed cases, by date', fontsize=14)
+	ax1.set_title(timestamp, fontsize=9)
+	ax1.legend(loc=2, fontsize='10')
 	#ax1.set_xlim(left=matplotlib.dates.date2num(datetime.date.today()))
 	plt.show()
 	plt.close(fig1)
 
-def Graph_Daily_Deaths_Lineal(data, filter):
+def Graph_Daily_Deaths_Lineal(data, filter, timestamp):
 	linestyles = ['-','--','-.',':']
-	fig1 = plt.figure(dpi=100)
+	fig1 = plt.figure(dpi=300)
 	ax1 = plt.axes([0.1, 0.1, 0.8, 0.8]) #xticks=[], yticks=[]
 	i = 0
 	for name in filter:
@@ -241,15 +242,16 @@ def Graph_Daily_Deaths_Lineal(data, filter):
 			ax1.plot_date(country_data.date_series.x, country_data.date_series.deaths,linestyles[(i//6)%4], label=country_data.name)
 			i += 1
 		
-	plt.title('Total deaths, by date')
-	ax1.legend(loc=2)
+	fig1.suptitle('Total deaths, by date', fontsize=14)
+	ax1.set_title(timestamp, fontsize=9)
+	ax1.legend(loc=2, fontsize='10')
 	#ax1.set_xlim(left=matplotlib.dates.date2num(datetime.date.today()))
 	plt.show()
 	plt.close(fig1)
 	
-def Graph_Confirmed_Over_Threshold_Lineal(data, filter):
+def Graph_Confirmed_Over_Threshold_Lineal(data, filter, timestamp):
 	linestyles = ['-','--','-.',':']
-	fig2 = plt.figure(dpi=100) #figsize=(16,8),dpi=200
+	fig2 = plt.figure(dpi=300) #figsize=(16,8),dpi=200
 	ax2 = plt.axes([0.1, 0.1, 0.8, 0.8])
 	i = 0
 	for name in filter:
@@ -258,16 +260,17 @@ def Graph_Confirmed_Over_Threshold_Lineal(data, filter):
 			ax2.plot(country_data.over_threshold_series.confirmed_x, country_data.over_threshold_series.confirmed, label=country_data.name,ls=linestyles[(i//6)%4],marker='')
 			i += 1
 
-	plt.title('Confirmed case progression per day after 100 cases')
-	ax2.legend(loc=2)
+	fig2.suptitle('Confirmed case progression per day after 100 cases', fontsize=14)
+	ax2.set_title(timestamp, fontsize=9)
+	ax2.legend(loc=2, fontsize='10')
 	ax2.set_ylim(top=4000,bottom=0)
 	ax2.set_xlim(right=20,left=0)
 	plt.show()
 	plt.close(fig2)
 
-def Graph_Confirmed_Over_Threshold_Log(data, filter):
+def Graph_Confirmed_Over_Threshold_Log(data, filter, timestamp):
 	linestyles = ['-','--','-.',':']
-	fig2 = plt.figure(dpi=100) #figsize=(16,8),dpi=200
+	fig2 = plt.figure(dpi=300) #figsize=(16,8),dpi=200
 	ax2 = plt.axes([0.1, 0.1, 0.8, 0.8],yscale='log')
 	i = 0
 	for name in filter:
@@ -276,16 +279,17 @@ def Graph_Confirmed_Over_Threshold_Log(data, filter):
 			ax2.plot(country_data.over_threshold_series.confirmed_x, country_data.over_threshold_series.confirmed, label=country_data.name,ls=linestyles[(i//6)%4],marker='')
 			i += 1
 
-	plt.title('Confirmed case progression per day after 100 cases (log scale)')
-	ax2.legend(loc=2)
+	fig2.suptitle('Confirmed case progression per day after 100 cases (log scale)', fontsize=14)
+	ax2.set_title(timestamp, fontsize=9)
+	ax2.legend(loc=2, fontsize='10')
 	ax2.set_ylim(top=20000,bottom=0)
 	ax2.set_xlim(right=20,left=0)
 	plt.show()
 	plt.close(fig2)
 
-def Graph_Deaths_Over_Threshold_Log(data, filter):
+def Graph_Deaths_Over_Threshold_Log(data, filter, timestamp):
 	linestyles = ['-','--','-.',':']
-	fig2 = plt.figure(dpi=100) #figsize=(16,8),dpi=200
+	fig2 = plt.figure(dpi=300) #figsize=(16,8),dpi=200
 	ax2 = plt.axes([0.1, 0.1, 0.8, 0.8], yscale='log')
 	i = 0
 	for name in filter:
@@ -294,16 +298,17 @@ def Graph_Deaths_Over_Threshold_Log(data, filter):
 			ax2.plot(country_data.over_threshold_series.deaths_x, country_data.over_threshold_series.deaths, label=country_data.name,ls=linestyles[(i//6)%4],marker='')
 			i += 1
 
-	plt.title('Total deaths per day after 100 deaths (log scale)')
-	ax2.legend(loc=2)
+	fig2.suptitle('Total deaths per day after 100 deaths (log scale)', fontsize=14)
+	ax2.set_title(timestamp, fontsize=9)
+	ax2.legend(loc=2, fontsize='10')
 	ax2.set_ylim(bottom=0,top=20000)
 	ax2.set_xlim(right=20,left=0)
 	plt.show()
 	plt.close(fig2)
 
-def Graph_Confirmed_Deltas_Bar(data, filter):
+def Graph_Confirmed_Deltas_Bar(data, filter, timestamp):
 	colors = ['b','g','r','c','m','y','k']
-	fig3 = plt.figure(dpi=100) #figsize=(16,8),dpi=200
+	fig3 = plt.figure(dpi=300) #figsize=(16,8),dpi=200
 	ax3 = plt.axes([0.1, 0.1, 0.8, 0.8])
 	i = 0
 	for name in filter:
@@ -314,16 +319,17 @@ def Graph_Confirmed_Deltas_Bar(data, filter):
 			i += 1
 		if i >= 6:
 			break
-	plt.title('Confirmed case difference per day after 100 cases')
-	ax3.legend(loc=2)
+	fig3.suptitle('Confirmed case difference per day after 100 cases', fontsize=14)
+	ax2.set_title(timestamp, fontsize=9)
+	ax3.legend(loc=2, fontsize='10')
 	ax3.set_ylim(top=2000,bottom=0)
 	ax3.set_xlim(right=20,left=0)
 	plt.show()
 	plt.close(fig3)
 
-def Graph_Doubling_Time_Over_Threshold_Lineal(data, filter):
+def Graph_Doubling_Time_Over_Threshold_Lineal(data, filter, timestamp):
 	linestyles = ['-','--','-.',':']
-	fig2 = plt.figure(dpi=100) #figsize=(16,8),dpi=200
+	fig2 = plt.figure(dpi=300) #figsize=(16,8),dpi=200
 	ax2 = plt.axes([0.1, 0.1, 0.8, 0.8])
 	i = 0
 	for name in filter:
@@ -332,8 +338,9 @@ def Graph_Doubling_Time_Over_Threshold_Lineal(data, filter):
 			ax2.plot(country_data.over_threshold_series.confirmed_x, country_data.over_threshold_series.confirmed_doubling_time, label=country_data.name,ls=linestyles[(i//6)%4],marker='')
 			i += 1
 
-	plt.title('Confirmed case doubling time in days, per day after 100 cases (3 day average)')
-	ax2.legend(loc=2)
+	fig2.suptitle('Confirmed case doubling time in days, per day after 100 cases (3 day average)', fontsize=14)
+	ax2.set_title(timestamp, fontsize=9)
+	ax2.legend(loc=2, fontsize='10')
 	ax2.set_ylim(bottom=0,top=20)
 	ax2.set_xlim(right=20,left=0)
 	plt.show()
@@ -344,17 +351,19 @@ def main():
 	confirmed_url = 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv'
 	deaths_url = 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv'
 	recovered_url = 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_recovered_global.csv'
+	timestamp = 'Source: John Hopkins - ' + datetime.datetime.now(tz=datetime.timezone.utc).isoformat(' ', timespec='seconds')
 
 	countries_filter = Load_Countries_Filter()
 	countries_data = Load(confirmed_url, deaths_url, recovered_url, countries_filter)
 
-	Graph_Daily_Confirmed_Lineal(countries_data, countries_filter)
-	Graph_Daily_Deaths_Lineal(countries_data, countries_filter)
-	Graph_Confirmed_Over_Threshold_Lineal(countries_data, countries_filter)
-	Graph_Confirmed_Over_Threshold_Log(countries_data, countries_filter)
-	Graph_Deaths_Over_Threshold_Log(countries_data, countries_filter)
-	#Graph_Confirmed_Deltas_Bar(countries_data, countries_filter)
-	Graph_Doubling_Time_Over_Threshold_Lineal(countries_data, countries_filter)
+	Graph_Daily_Confirmed_Lineal(countries_data, countries_filter, timestamp)
+	Graph_Daily_Deaths_Lineal(countries_data, countries_filter, timestamp)
+	Graph_Confirmed_Over_Threshold_Lineal(countries_data, countries_filter, timestamp)
+	Graph_Confirmed_Over_Threshold_Log(countries_data, countries_filter, timestamp)
+	Graph_Deaths_Over_Threshold_Log(countries_data, countries_filter, timestamp)
+	#Graph_Confirmed_Deltas_Bar(countries_data, countries_filter, timestamp)
+	Graph_Doubling_Time_Over_Threshold_Lineal(countries_data, countries_filter, timestamp)
 
 if __name__ == '__main__':
 	main()
+	
