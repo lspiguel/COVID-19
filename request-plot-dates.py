@@ -164,39 +164,48 @@ def Load(url_confirmed, deaths_url, recovered_url, filter):
 		reader = csv.reader(f, delimiter=',', quotechar='"')
 		headers = next(reader)[4:]
 		for row in reader:
-			name = row[1]
-			if name in filter:
-				if (not name in return_data):
-					return_data[name] = Country_Data(name, headers)
-					return_data[name].SetConfirmed(row[4:])
-				else:
-					return_data[name].AddConfirmed(row[4:])
+			try:
+				name = row[1]
+				if name in filter:
+					if (not name in return_data):
+						return_data[name] = Country_Data(name, headers)
+						return_data[name].SetConfirmed(row[4:])
+					else:
+						return_data[name].AddConfirmed(row[4:])
+			except:
+				pass
 					
 	with closing(requests.get(deaths_url)) as r:
 		f = (line.decode('utf-8') for line in r.iter_lines())
 		reader = csv.reader(f, delimiter=',', quotechar='"')
 		next(reader)
 		for row in reader:
-			name = row[1]
-			if name in filter:
-				if name in return_data:
-					if not return_data[name].HasDeathsData():
-						return_data[name].SetDeaths(row[4:])
-					else:
-						return_data[name].AddDeaths(row[4:])
+			try:
+				name = row[1]
+				if name in filter:
+					if name in return_data:
+						if not return_data[name].HasDeathsData():
+							return_data[name].SetDeaths(row[4:])
+						else:
+							return_data[name].AddDeaths(row[4:])
+			except:
+				pass
 					
 	with closing(requests.get(recovered_url)) as r:
 		f = (line.decode('utf-8') for line in r.iter_lines())
 		reader = csv.reader(f, delimiter=',', quotechar='"')
 		next(reader)
 		for row in reader:
-			name = row[1]
-			if name in filter:
-				if name in return_data:
-					if not return_data[name].HasRecoveredData():
-						return_data[name].SetRecovered(row[4:])
-					else:
-						return_data[name].AddRecovered(row[4:])
+			try:
+				name = row[1]
+				if name in filter:
+					if name in return_data:
+						if not return_data[name].HasRecoveredData():
+							return_data[name].SetRecovered(row[4:])
+						else:
+							return_data[name].AddRecovered(row[4:])
+			except:
+				pass
 
 	return return_data
 
@@ -263,8 +272,8 @@ def Graph_Confirmed_Over_Threshold_Lineal(data, filter, timestamp):
 	fig2.suptitle('Confirmed case progression per day after 100 cases', fontsize=14)
 	ax2.set_title(timestamp, fontsize=9)
 	ax2.legend(loc=2, fontsize='10')
-	ax2.set_ylim(top=4000,bottom=0)
-	ax2.set_xlim(right=20,left=0)
+	ax2.set_ylim(top=10000,bottom=0)
+	ax2.set_xlim(right=40,left=0)
 	plt.show()
 	plt.close(fig2)
 
@@ -282,8 +291,8 @@ def Graph_Confirmed_Over_Threshold_Log(data, filter, timestamp):
 	fig2.suptitle('Confirmed case progression per day after 100 cases (log scale)', fontsize=14)
 	ax2.set_title(timestamp, fontsize=9)
 	ax2.legend(loc=2, fontsize='10')
-	ax2.set_ylim(top=20000,bottom=0)
-	ax2.set_xlim(right=20,left=0)
+	ax2.set_ylim(top=5000000,bottom=0)
+	ax2.set_xlim(right=40,left=0)
 	plt.show()
 	plt.close(fig2)
 
@@ -301,8 +310,8 @@ def Graph_Deaths_Over_Threshold_Log(data, filter, timestamp):
 	fig2.suptitle('Total deaths per day after 100 deaths (log scale)', fontsize=14)
 	ax2.set_title(timestamp, fontsize=9)
 	ax2.legend(loc=2, fontsize='10')
-	ax2.set_ylim(bottom=0,top=20000)
-	ax2.set_xlim(right=20,left=0)
+	ax2.set_ylim(bottom=0,top=5000000)
+	ax2.set_xlim(right=40,left=0)
 	plt.show()
 	plt.close(fig2)
 
@@ -322,8 +331,8 @@ def Graph_Confirmed_Deltas_Bar(data, filter, timestamp):
 	fig3.suptitle('Confirmed case difference per day after 100 cases', fontsize=14)
 	ax2.set_title(timestamp, fontsize=9)
 	ax3.legend(loc=2, fontsize='10')
-	ax3.set_ylim(top=2000,bottom=0)
-	ax3.set_xlim(right=20,left=0)
+	ax3.set_ylim(top=3000,bottom=0)
+	ax3.set_xlim(right=40,left=0)
 	plt.show()
 	plt.close(fig3)
 
@@ -342,7 +351,7 @@ def Graph_Doubling_Time_Over_Threshold_Lineal(data, filter, timestamp):
 	ax2.set_title(timestamp, fontsize=9)
 	ax2.legend(loc=2, fontsize='10')
 	ax2.set_ylim(bottom=0,top=20)
-	ax2.set_xlim(right=20,left=0)
+	ax2.set_xlim(right=40,left=0)
 	plt.show()
 	plt.close(fig2)
 
