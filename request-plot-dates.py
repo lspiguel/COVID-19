@@ -272,7 +272,29 @@ def Graph_Daily_Deaths_Lineal(config, data, filter, timestamp):
 	if(config.save):
 		fig.savefig('Graph_Daily_Deaths_Lineal.png')
 	plt.close(fig)
-	
+
+def Graph_Daily_ConfirmedRecoveredDeaths_Lineal(config, data, filter, timestamp):
+	fig = plt.figure(dpi=config.dpi)
+	axis = plt.axes([0.1, 0.1, 0.8, 0.8]) #xticks=[], yticks=[]
+	i = 0
+	name = filter[0]
+	country_data = data[name]
+	first = len(country_data.date_series.x) // 2
+
+	axis.plot_date(country_data.date_series.x[first:], country_data.date_series.confirmed[first:], label='Confirmed', linestyle='-')
+	axis.plot_date(country_data.date_series.x[first:], country_data.date_series.recovered[first:], label='Recovered', linestyle='-')
+	axis.plot_date(country_data.date_series.x[first:], country_data.date_series.deaths[first:], label='Deaths', linestyle='-')
+		
+	fig.suptitle('Confirmed/Recovere/dDeaths for ' + name + ', by date', fontsize=config.titlefontsize)
+	axis.set_title(timestamp, fontsize=config.subtitlefontsize)
+	axis.legend(loc=2, fontsize=config.legendfontsize)
+	#axis.set_xlim(left=matplotlib.dates.date2num(datetime.date.today()))
+	if(config.draw):
+		plt.show()
+	if(config.save):
+		fig.savefig('Graph_Daily_ConfirmedRecoveredDeaths_Lineal.png')
+	plt.close(fig)
+
 def Graph_Confirmed_Over_Threshold_Lineal(config, data, filter, timestamp):
 	linestyles = ['-','--','-.',':']
 	fig = plt.figure(dpi=config.dpi) #figsize=(16,8),dpi=200
@@ -395,10 +417,11 @@ def main():
 	countries_filter = Load_Countries_Filter()
 	countries_data = Load(confirmed_url, deaths_url, recovered_url, countries_filter)
 
-	config = Configuration(True, False, 300, 14, 10, 9)
+	config = Configuration(True, True, 300, 14, 10, 9)
 
 	Graph_Daily_Confirmed_Lineal(config, countries_data, countries_filter, timestamp)
 	Graph_Daily_Deaths_Lineal(config, countries_data, countries_filter, timestamp)
+	Graph_Daily_ConfirmedRecoveredDeaths_Lineal(config, countries_data, countries_filter, timestamp)
 	Graph_Confirmed_Over_Threshold_Lineal(config, countries_data, countries_filter, timestamp)
 	Graph_Confirmed_Over_Threshold_Log(config, countries_data, countries_filter, timestamp)
 	Graph_Deaths_Over_Threshold_Log(config, countries_data, countries_filter, timestamp)
