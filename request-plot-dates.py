@@ -285,7 +285,7 @@ def Graph_Daily_ConfirmedRecoveredDeaths_Lineal(config, data, filter, timestamp)
 	axis.plot_date(country_data.date_series.x[first:], country_data.date_series.recovered[first:], label='Recovered', linestyle='-')
 	axis.plot_date(country_data.date_series.x[first:], country_data.date_series.deaths[first:], label='Deaths', linestyle='-')
 		
-	fig.suptitle('Confirmed/Recovere/dDeaths for ' + name + ', by date', fontsize=config.titlefontsize)
+	fig.suptitle('Confirmed/Recovered/Deaths for ' + name + ', by date', fontsize=config.titlefontsize)
 	axis.set_title(timestamp, fontsize=config.subtitlefontsize)
 	axis.legend(loc=2, fontsize=config.legendfontsize)
 	#axis.set_xlim(left=matplotlib.dates.date2num(datetime.date.today()))
