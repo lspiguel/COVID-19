@@ -428,7 +428,7 @@ def main():
 	# Font size for subtitle (integer),
 	# Font size for legends (integer),
 	# Number of days to plot on over threshold graphs (integer)
-	config = Configuration(True, False, 300, 14, 10, 9, 90)
+	config = Configuration(True, True, 300, 14, 10, 9, 90)
 
 	# Do the plots 
 	Graph_Daily_Confirmed_Lineal(config, countries_data, countries_filter, timestamp)
