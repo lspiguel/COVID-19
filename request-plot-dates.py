@@ -8,13 +8,14 @@ import matplotlib.pyplot as plt
 from contextlib import closing
 
 class Configuration():
-	def __init__(self, draw, save, dpi, titlefontsize, subtitlefontsize, legendfontsize):
+	def __init__(self, draw, save, dpi, titlefontsize, subtitlefontsize, legendfontsize, days):
 		self.draw = draw
 		self.save = save
 		self.dpi = dpi
 		self.titlefontsize = titlefontsize
 		self.subtitlefontsize = subtitlefontsize
 		self.legendfontsize = legendfontsize
+		self.days = days
 
 class Date_Series():
 	def __init__(self, x):
@@ -239,7 +240,7 @@ def Graph_Daily_Confirmed_Lineal(config, data, filter, timestamp):
 	for name in filter:
 		country_data = data[name]
 		if len(country_data.date_series.confirmed) > 0:
-			axis.plot_date(country_data.date_series.x, country_data.date_series.confirmed,linestyles[(i//6)%4], label=country_data.name)
+			axis.plot_date(country_data.date_series.x, country_data.date_series.confirmed, linestyles[(i//6)%4], label=country_data.name)
 			i += 1
 		
 	fig.suptitle('Total confirmed cases, by date', fontsize=config.titlefontsize)
@@ -260,7 +261,7 @@ def Graph_Daily_Deaths_Lineal(config, data, filter, timestamp):
 	for name in filter:
 		country_data = data[name]
 		if len(country_data.date_series.deaths) > 0:
-			axis.plot_date(country_data.date_series.x, country_data.date_series.deaths,linestyles[(i//6)%4], label=country_data.name)
+			axis.plot_date(country_data.date_series.x, country_data.date_series.deaths, linestyles[(i//6)%4], label=country_data.name)
 			i += 1
 		
 	fig.suptitle('Total deaths, by date', fontsize=config.titlefontsize)
@@ -303,14 +304,14 @@ def Graph_Confirmed_Over_Threshold_Lineal(config, data, filter, timestamp):
 	for name in filter:
 		country_data = data[name]
 		if len(country_data.over_threshold_series.confirmed) > 0:
-			axis.plot(country_data.over_threshold_series.confirmed_x, country_data.over_threshold_series.confirmed, label=country_data.name,ls=linestyles[(i//6)%4],marker='')
+			axis.plot(country_data.over_threshold_series.confirmed_x, country_data.over_threshold_series.confirmed, label=country_data.name, ls=linestyles[(i//6)%4],marker='')
 			i += 1
 
 	fig.suptitle('Confirmed case progression per day after 100 cases', fontsize=config.titlefontsize)
 	axis.set_title(timestamp, fontsize=config.subtitlefontsize)
 	axis.legend(loc=2, fontsize=config.legendfontsize)
-	axis.set_ylim(top=10000,bottom=0)
-	axis.set_xlim(right=40,left=0)
+	axis.set_ylim(top=10000, bottom=0)
+	axis.set_xlim(right=config.days, left=0)
 	if(config.draw):
 		plt.show()
 	if(config.save):
@@ -332,7 +333,7 @@ def Graph_Confirmed_Over_Threshold_Log(config, data, filter, timestamp):
 	axis.set_title(timestamp, fontsize=config.subtitlefontsize)
 	axis.legend(loc=2, fontsize=config.legendfontsize)
 	axis.set_ylim(top=5000000)
-	axis.set_xlim(right=40,left=0)
+	axis.set_xlim(right=config.days, left=0)
 	if(config.draw):
 		plt.show()
 	if(config.save):
@@ -354,7 +355,7 @@ def Graph_Deaths_Over_Threshold_Log(config, data, filter, timestamp):
 	axis.set_title(timestamp, fontsize=config.subtitlefontsize)
 	axis.legend(loc=2, fontsize=config.legendfontsize)
 	axis.set_ylim(top=5000000)
-	axis.set_xlim(right=40,left=0)
+	axis.set_xlim(right=config.days, left=0)
 	if(config.draw):
 		plt.show()
 	if(config.save):
@@ -377,8 +378,8 @@ def Graph_Confirmed_Deltas_Bar(config, data, filter, timestamp):
 	fig.suptitle('Confirmed case difference per day after 100 cases', fontsize=config.titlefontsize)
 	ax3.set_title(timestamp, fontsize=config.subtitlefontsize)
 	ax3.legend(loc=2, fontsize=config.legendfontsize)
-	ax3.set_ylim(top=3000,bottom=0)
-	ax3.set_xlim(right=40,left=0)
+	ax3.set_ylim(top=3000, bottom=0)
+	ax3.set_xlim(right=config.days, left=0)
 	if(config.draw):
 		plt.show()
 	if(config.save):
@@ -393,32 +394,43 @@ def Graph_Doubling_Time_Over_Threshold_Lineal(config, data, filter, timestamp):
 	for name in filter:
 		country_data = data[name]
 		if len(country_data.over_threshold_series.confirmed_doubling_time) > 0:
-			axis.plot(country_data.over_threshold_series.confirmed_x, country_data.over_threshold_series.confirmed_doubling_time, label=country_data.name,ls=linestyles[(i//6)%4],marker='')
+			axis.plot(country_data.over_threshold_series.confirmed_x, country_data.over_threshold_series. confirmed_doubling_time, label=country_data.name, ls=linestyles[(i//6)%4], marker='')
 			i += 1
 
 	fig.suptitle('Confirmed case doubling time in days, per day after 100 cases (3 day average)', fontsize=config.titlefontsize)
 	axis.set_title(timestamp, fontsize=config.subtitlefontsize)
 	axis.legend(loc=2, fontsize=config.legendfontsize)
-	axis.set_ylim(bottom=0,top=20)
-	axis.set_xlim(right=40,left=0)
+	axis.set_ylim(bottom=0, top=120)
+	axis.set_xlim(right=config.days, left=0)
 	if(config.draw):
 		plt.show()
 	if(config.save):
 		fig.savefig('Graph_Doubling_Time_Over_Threshold_Lineal.png')
 	plt.close(fig)
 
-
 def main():
+	# Urls to get data from John Hopkins (GitHub raw repositories, master branch)
 	confirmed_url = 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv'
 	deaths_url = 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv'
 	recovered_url = 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_recovered_global.csv'
 	timestamp = 'Source: John Hopkins - ' + datetime.datetime.now(tz=datetime.timezone.utc).isoformat(' ', timespec='seconds')
 
+	# Load data
 	countries_filter = Load_Countries_Filter()
 	countries_data = Load(confirmed_url, deaths_url, recovered_url, countries_filter)
 
-	config = Configuration(True, True, 300, 14, 10, 9)
+	# This is where a configuration is set
+	# The parameters are as follows:
+	# Show - display plots on screen (boolean),
+	# Save - whether to save plots (boolean),
+	# DPI - Dots per inch to use on plots (integer),
+	# Font size for title (integer),
+	# Font size for subtitle (integer),
+	# Font size for legends (integer),
+	# Number of days to plot on over threshold graphs (integer)
+	config = Configuration(True, False, 300, 14, 10, 9, 90)
 
+	# Do the plots 
 	Graph_Daily_Confirmed_Lineal(config, countries_data, countries_filter, timestamp)
 	Graph_Daily_Deaths_Lineal(config, countries_data, countries_filter, timestamp)
 	Graph_Daily_ConfirmedRecoveredDeaths_Lineal(config, countries_data, countries_filter, timestamp)
