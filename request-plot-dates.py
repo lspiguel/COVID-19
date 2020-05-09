@@ -103,14 +103,16 @@ class Over_Threshold_Series():
 				deltas.append(self.confirmed[i] - self.confirmed[i - 1])
 		doublings = []
 		if len(deltas) > 3:
+			lastavg = float("inf")
 			doublings.append(float("inf"))
 			doublings.append(float("inf"))
 			for i in range(2, len(self.confirmed)):
 				avg = float(deltas[i - 2] + deltas[i - 1] + deltas[i]) / 3
-				if avg != 0:
-					doublings.append(float(self.confirmed[i]) / avg)
+				if avg > 0:
+					lastavg = float(self.confirmed[i]) / avg
+					doublings.append(lastavg)
 				else:
-					doublings.append(float("inf"))
+					doublings.append(lastavg)
 		self.confirmed_delta = np.array(deltas)
 		self.confirmed_doubling_time = np.array(doublings)
 			
