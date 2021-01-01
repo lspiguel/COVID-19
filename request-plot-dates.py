@@ -386,7 +386,37 @@ def Graph_Confirmed_Deltas_Bar(config, data, filter, timestamp):
 		plt.show()
 	if(config.save):
 		fig.savefig('Graph_Confirmed_Deltas_Bar.png')
-	plt.close(fig3)
+	plt.close(fig)
+
+def Graph_Confirmed_Deltas_Log(config, data, filter, timestamp):
+	colors = ['b','g','r','c','m','y','k']
+	linestyles = ['-','--','-.',':']
+	fig = plt.figure(dpi=config.dpi) #figsize=(16,8),dpi=200
+	ax3 = plt.axes([0.1, 0.1, 0.8, 0.8], yscale='log')
+	i = 0
+	for name in filter:
+		country_data = data[name]
+		if len(country_data.over_threshold_series.confirmed_delta) > 0:
+			x = [x + i / 7 for x in country_data.over_threshold_series.confirmed_x]
+			ax3.plot(x, country_data.over_threshold_series.confirmed_delta, label=country_data.name,color=colors[i%7], ls=linestyles[(i//6)%4])
+			lastdatapoint = country_data.name + ': ' + str(int(country_data.over_threshold_series. confirmed_delta[-1]))
+			ax3.annotate(lastdatapoint, \
+				xy = (country_data.over_threshold_series.confirmed_x[-1],country_data.over_threshold_series. confirmed_delta[-1]), \
+				textcoords="offset points", \
+				xytext=(20,0), \
+				ha='left', \
+				arrowprops=dict(arrowstyle='wedge'))			
+			i += 1
+	fig.suptitle('Confirmed case difference per day after 100 cases (log scale)', fontsize=config.titlefontsize)
+	ax3.set_title(timestamp, fontsize=config.subtitlefontsize)
+	ax3.legend(loc=2, fontsize=config.legendfontsize)
+	ax3.set_ylim(bottom=10) #top=3000, 
+	ax3.set_xlim(right=config.days, left=0)
+	if(config.draw):
+		plt.show()
+	if(config.save):
+		fig.savefig('Graph_Confirmed_Deltas_Log.png')
+	plt.close(fig)
 
 def Graph_Doubling_Time_Over_Threshold_Lineal(config, data, filter, timestamp):
 	linestyles = ['-','--','-.',':']
@@ -397,12 +427,19 @@ def Graph_Doubling_Time_Over_Threshold_Lineal(config, data, filter, timestamp):
 		country_data = data[name]
 		if len(country_data.over_threshold_series.confirmed_doubling_time) > 0:
 			axis.plot(country_data.over_threshold_series.confirmed_x, country_data.over_threshold_series. confirmed_doubling_time, label=country_data.name, ls=linestyles[(i//6)%4], marker='')
+			lastdatapoint = country_data.name + ': ' + str(int(country_data.over_threshold_series. confirmed_doubling_time[-1]))
+			axis.annotate(lastdatapoint, \
+				xy = (country_data.over_threshold_series.confirmed_x[-1],country_data.over_threshold_series. confirmed_doubling_time[-1]), \
+				textcoords="offset points", \
+				xytext=(20,0), \
+				ha='left', \
+				arrowprops=dict(arrowstyle='wedge'))
 			i += 1
 
 	fig.suptitle('Confirmed case doubling time in days, per day after 100 cases (3 day average)', fontsize=config.titlefontsize)
 	axis.set_title(timestamp, fontsize=config.subtitlefontsize)
 	axis.legend(loc=2, fontsize=config.legendfontsize)
-	axis.set_ylim(bottom=0, top=120)
+	axis.set_ylim(bottom=0, top=210)
 	axis.set_xlim(right=config.days, left=0)
 	if(config.draw):
 		plt.show()
@@ -430,18 +467,20 @@ def main():
 	# Font size for subtitle (integer),
 	# Font size for legends (integer),
 	# Number of days to plot on over threshold graphs (integer)
-	config = Configuration(True, True, 300, 14, 10, 9, 90)
+	config = Configuration(True, True, 300, 14, 10, 9, 350)
 
 	# Do the plots 
 	Graph_Daily_Confirmed_Lineal(config, countries_data, countries_filter, timestamp)
 	Graph_Daily_Deaths_Lineal(config, countries_data, countries_filter, timestamp)
 	Graph_Daily_ConfirmedRecoveredDeaths_Lineal(config, countries_data, countries_filter, timestamp)
-	Graph_Confirmed_Over_Threshold_Lineal(config, countries_data, countries_filter, timestamp)
+	#Graph_Confirmed_Over_Threshold_Lineal(config, countries_data, countries_filter, timestamp)
 	Graph_Confirmed_Over_Threshold_Log(config, countries_data, countries_filter, timestamp)
 	Graph_Deaths_Over_Threshold_Log(config, countries_data, countries_filter, timestamp)
 	#Graph_Confirmed_Deltas_Bar(config, countries_data, countries_filter, timestamp)
+	Graph_Confirmed_Deltas_Log(config, countries_data, countries_filter, timestamp)
 	Graph_Doubling_Time_Over_Threshold_Lineal(config, countries_data, countries_filter, timestamp)
 
 if __name__ == '__main__':
 	main()
+	
 	
